@@ -8,11 +8,13 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 
 import { Trip } from "@prisma/client"
+import { differenceInDays } from "date-fns";
 
 interface TripReservationProps {
   tripStartDate: Date;
   tripEndDate: Date;
-  maxGuests: Number;
+  maxGuests: number;
+  pricePerDay: number;
 }
 
 interface TripReservationForm {
@@ -21,7 +23,7 @@ interface TripReservationForm {
   endDate: Date | null
 }
 
-const TripReservation = ({ tripStartDate, tripEndDate, maxGuests }: TripReservationProps) => {
+const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay }: TripReservationProps) => {
   const {
     register,
     handleSubmit,
@@ -35,6 +37,7 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests }: TripReservat
   }
 
   const startDate = watch("startDate");
+  const endDate = watch("endDate");
 
   return (
     <div>
@@ -80,6 +83,7 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests }: TripReservat
                 className="w-full"
                 maxDate={tripEndDate}
                 minDate={startDate ??  tripStartDate}
+                disabled={!startDate}
                 />
             )}
           />
@@ -98,8 +102,13 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests }: TripReservat
         />
 
         <div className="flex justify-between mt-3">
-          <p className="font-medium text-sm text-primaryDarker">Total: </p>
-          <p className="font-medium text-sm text-primaryDarker">R$ 2.500</p>
+          <p className="font-medium text-sm text-primaryDarker">{startDate && endDate ? `Total: (${differenceInDays(endDate, startDate)} diárias)` : "Total:" }</p>
+          <p className="font-medium text-sm text-primaryDarker">
+          {startDate && endDate ? 
+          `R$ ${differenceInDays(endDate, startDate) * pricePerDay}`
+          : "R$ 0"}
+          </p>
+          
         </div>
 
         <div className=" pb-10 border-b border-grayLighter w-full">
