@@ -10,7 +10,9 @@ import Button from "@/components/Button";
 import { Trip } from "@prisma/client"
 
 interface TripReservationProps {
-  trip: Trip
+  tripStartDate: Date;
+  tripEndDate: Date;
+  maxGuests: Number;
 }
 
 interface TripReservationForm {
@@ -19,17 +21,20 @@ interface TripReservationForm {
   endDate: Date | null
 }
 
-const TripReservation = ({trip}: TripReservationProps) => {
+const TripReservation = ({ tripStartDate, tripEndDate, maxGuests }: TripReservationProps) => {
   const {
     register,
     handleSubmit,
     formState:{ errors },
-    control
+    control,
+    watch
   } = useForm<TripReservationForm>();
 
   const onSubmit = (data: any) => {
     console.log(data)
   }
+
+  const startDate = watch("startDate");
 
   return (
     <div>
@@ -51,7 +56,9 @@ const TripReservation = ({trip}: TripReservationProps) => {
                 errorMessage={errors.startDate?.message}
                 selected={field.value}
                 placeholderText="Data de Início"
-                className="w-full"/>
+                className="w-full"
+                minDate={tripStartDate}
+              />
             )}
           />
           <Controller
@@ -70,7 +77,10 @@ const TripReservation = ({trip}: TripReservationProps) => {
                 errorMessage={errors.endDate?.message}
                 selected={field.value}
                 placeholderText="Data final"
-                className="w-full"/>
+                className="w-full"
+                maxDate={tripEndDate}
+                minDate={startDate ??  tripStartDate}
+                />
             )}
           />
         </div>
@@ -81,7 +91,7 @@ const TripReservation = ({trip}: TripReservationProps) => {
             message: "Número de hóspedes é obrigatório."
           },
         })}
-        placeholder={`Número de hóspedes (max:${trip.maxGuests})`}
+        placeholder={`Número de hóspedes (max:${maxGuests})`}
         className="mt-4"
         error={!!errors?.guests}
         errorMessage={errors?.guests?.message}
