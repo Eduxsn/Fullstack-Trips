@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form"
 
 import DatePicker from "@/components/DatePicker";
@@ -8,9 +8,11 @@ import Input from "@/components/Input";
 import Button from "@/components/Button";
 
 import { Trip } from "@prisma/client"
-import { differenceInDays } from "date-fns";
+import { differenceInDays, subDays } from "date-fns";
+import { TailSpin } from "react-loader-spinner";
 
 interface TripReservationProps {
+  tripId: string;
   tripStartDate: Date;
   tripEndDate: Date;
   maxGuests: number;
@@ -18,23 +20,68 @@ interface TripReservationProps {
 }
 
 interface TripReservationForm {
+  tripId: string;
   guests: number;
   startDate: Date | null
   endDate: Date | null
 }
 
-const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay }: TripReservationProps) => {
+const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay, tripId }: TripReservationProps) => {
+  const [isFetching, setIsFetching] = useState(true)
+
   const {
     register,
     handleSubmit,
     formState:{ errors },
     control,
-    watch
+    watch,
+    setError,
   } = useForm<TripReservationForm>();
 
-  const onSubmit = (data: any) => {
-    console.log(data)
-  }
+  const onSubmit = async (data: TripReservationForm) => {
+    setIsFetching(false)
+    const response = await fetch('http://localhost:3000/api/trips/check', {
+      method: "POST",
+      body: Buffer.from(
+        JSON.stringify({
+          startDate: data.startDate,
+          endDate: data.endDate,
+          tripId
+        })
+      )
+    });
+    setIsFetching(true)
+
+    const res = await response.json();
+
+    if (res?.error?.code === 'TRIP_ALREADY_RESERVED') {
+      setError("startDate", {
+        type: "manual",
+        message: "Esta data já está reservada"
+      })
+
+      setError("endDate", {
+        type: "manual",
+        message: "Esta data já está reservada"
+      })
+    }
+
+    if (res?.error?.code === 'INVALID_START_DATE') {
+      setError("startDate", {
+        type: "manual",
+        message: "Data inválida"
+      })
+    }
+
+    if (res?.error?.code === 'INVALID_END_DATE') {
+      setError("endDate", {
+        type: "manual",
+        message: "Data inválida"
+      })
+    }
+
+  };
+
 
   const startDate = watch("startDate");
   const endDate = watch("endDate");
@@ -80,7 +127,7 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay }:
                 errorMessage={errors.endDate?.message}
                 selected={field.value}
                 placeholderText="Data final"
-                className="w-full"
+                className="w-full disabled:cursor-not-allowed"
                 maxDate={tripEndDate}
                 minDate={startDate ??  tripStartDate}
                 disabled={!startDate}
@@ -99,10 +146,11 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay }:
         className="mt-4"
         error={!!errors?.guests}
         errorMessage={errors?.guests?.message}
+        inputMode="numeric"
         />
 
         <div className="flex justify-between mt-3">
-          <p className="font-medium text-sm text-primaryDarker">{startDate && endDate ? `Total: (${differenceInDays(endDate, startDate)} diárias)` : "Total:" }</p>
+          <p className="font-medium text-sm text-primaryDarker">{startDate && endDate ? `Total (${differenceInDays(endDate, startDate)} noites)` : "Total" }</p>
           <p className="font-medium text-sm text-primaryDarker">
           {startDate && endDate ? 
           `R$ ${differenceInDays(endDate, startDate) * pricePerDay}`
@@ -112,7 +160,9 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay }:
         </div>
 
         <div className=" pb-10 border-b border-grayLighter w-full">
-          <Button onClick={() => handleSubmit(onSubmit)()} className="mt-3 w-full">Reservar agora</Button>
+          <Button disabled={!isFetching} onClick={() => handleSubmit(onSubmit)()} className="mt-3 w-full flex justify-center">
+            {isFetching ? "Reservar agora" : <TailSpin height={20} color="#FFF"/> }
+          </Button>
         </div>
       </div>
     </div>
