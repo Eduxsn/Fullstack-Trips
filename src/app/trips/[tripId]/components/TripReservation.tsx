@@ -10,6 +10,7 @@ import Button from "@/components/Button";
 import { Trip } from "@prisma/client"
 import { differenceInDays, subDays } from "date-fns";
 import { TailSpin } from "react-loader-spinner";
+import { useRouter } from "next/navigation";
 
 interface TripReservationProps {
   tripId: string;
@@ -37,6 +38,8 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay, t
     watch,
     setError,
   } = useForm<TripReservationForm>();
+
+  const router = useRouter()
 
   const onSubmit = async (data: TripReservationForm) => {
     setIsFetching(false)
@@ -67,7 +70,7 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay, t
     }
 
     if (res?.error?.code === 'INVALID_START_DATE') {
-      setError("startDate", {
+      return setError("startDate", {
         type: "manual",
         message: "Data inválida"
       })
@@ -79,6 +82,8 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay, t
         message: "Data inválida"
       })
     }
+
+    router.push(`/trips/${tripId}/confirmation?startDate=${data.startDate?.toISOString()}&endDate=${data.endDate?.toISOString()}&guests=${data.guests}`)
 
   };
 
