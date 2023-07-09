@@ -8,18 +8,17 @@ import { format } from "date-fns";
 import ptBR from "date-fns/locale/pt-BR";
 
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation"
 import { useState } from 'react';
 
 interface UserReservationItemProps {
   reservation: Prisma.TripReservationGetPayload<{
     include: {trip: true}
   }>;
+  fetchReservations: () => void
 }
 
-const UserReservationItem = ({reservation}: UserReservationItemProps) => {
+const UserReservationItem = ({reservation, fetchReservations}: UserReservationItemProps) => {
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
   const {trip} = reservation;
 
   const handleDeleteClick = async () => {
@@ -35,7 +34,7 @@ const UserReservationItem = ({reservation}: UserReservationItemProps) => {
     setIsLoading(false)
     toast.success("Reserva cancelada com sucesso!", { position: "bottom-center"})
 
-    router.push('/my-trips');
+    fetchReservations()
   }
 
   return (
