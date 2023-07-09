@@ -38,8 +38,15 @@ const Header = () => {
           <Image className="rounded-full shadow-md" height={35} width={35} alt={data.user.name!} src={data.user.image!}/>
 
           {menuIsOpen && (
-            <div className=" z-50 absolute top-14 left-0 w-full h-full bg-white rounded-lg shadow-md flex flex-col justify-center items-center">
-              <button className="text-primary text-sm font-semibold" onClick={handleLogoutClick}>
+            <div className=" z-50 absolute top-14 left-0 w-full h-[100px] bg-white rounded-lg shadow-md flex flex-col justify-center items-center">
+              
+              <Link href={"/my-trips"}>
+                <button className="text-primary text-sm font-semibold pb-2 border-b border-grayLighter border-solid">
+                  Minhas viagens
+                </button>
+              </Link>
+
+              <button className="text-primary text-sm font-semibold pt-2" onClick={handleLogoutClick}>
                 Logout
               </button>
             </div>
