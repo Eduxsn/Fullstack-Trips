@@ -125,7 +125,6 @@ function TripConfirmation({params} : {params: {tripId: string} }) {
         <p>{guests} hóspedes</p>
 
         <Button className="mt-5" onClick={handleBuyClick}>Finalizar Compra</Button>
-        <p></p>
       </div>
     </div>
   )
