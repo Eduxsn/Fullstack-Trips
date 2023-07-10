@@ -30,6 +30,7 @@ interface TripReservationForm {
 const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay, tripId }: TripReservationProps) => {
   const [isFetching, setIsFetching] = useState(true)
 
+
   const {
     register,
     handleSubmit,
