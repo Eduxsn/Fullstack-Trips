@@ -44,7 +44,7 @@ const TripReservation = ({ tripStartDate, tripEndDate, maxGuests, pricePerDay, t
 
   const onSubmit = async (data: TripReservationForm) => {
     setIsFetching(false)
-    const response = await fetch('http://localhost:3000/api/trips/check', {
+    const response = await fetch('/api/trips/check', {
       method: "POST",
       body: Buffer.from(
         JSON.stringify({
