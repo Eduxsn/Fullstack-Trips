@@ -42,10 +42,10 @@ const MyTrips = () => {
           {reservations.map(reservation => <UserReservationItem fetchReservations={fetchReservations} key={reservation.id} reservation={reservation}/>)}
         </div>
       ) : (
-        <div className="flex flex-col">
+        <div className="flex flex-col lg:max-w-[500px] lg">
           <p className="font-medium text-primaryDarker mt-2">Você ainda não possui nenhuma reserva! =(</p>
           <Link href="/">
-            <Button className="w-full mt-2">Fazer reserva</Button>
+            <Button className="w-full mt-2 lg:mt-5">Fazer reserva</Button>
           </Link>
         </div>
       )
